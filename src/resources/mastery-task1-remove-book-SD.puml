@@ -1,1 +1,28 @@
-PARTICIPANTS: use this file for creating the remove book from catalog diagram in mastery task 01
+@startuml
+
+actor "Client" as client
+participant "Load Balancer/ECS" as loadBalancer
+'participant "GetBookActivity" as getBookActivity
+participant "RemoveBookFromCatalogActivity" as removeBookFromCatalogActivity
+participant "CatalogDao" as catalogDao
+database "DynamoDB" as dynamoDB
+
+title RemoveBookFromCatalog
+
+client --> loadBalancer :HTTP request
+activate loadBalancer
+
+'loadBalancer --> getBookActivity : getBookActivity
+'activate getBookActivity
+
+loadBalancer --> removeBookFromCatalogActivity
+activate removeBookFromCatalogActivity
+
+removeBookFromCatalogActivity --> catalogDao : remove song from Catalog
+activate catalogDao
+
+catalogDao --> dynamoDB
+activate dynamoDB
+
+
+@enduml

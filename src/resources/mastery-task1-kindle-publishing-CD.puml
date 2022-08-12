@@ -1,1 +1,88 @@
-PARTICIPANTS: use this file for creating the class diagram in mastery task 01
+@startuml
+'title Activity
+
+class GetBookActivity {
+-recommendationServiceClient : RecommendationsServiceClient
+-catalogDao : CatalogDao
++GetBookActivity(CatalogDao catalogDao, RecommendationsServiceClient recommendationServiceClient) : GetBookResponse
++GetBookResponse execute(final GetBookRequest request) : GetBookResponse
+}
+
+class GetPublishingStatusActivity {
++GetPublishingStatusActivity()
++GetPublishingStatusResponse execute(GetPublishingStatusRequest publishingStatusRequest)
+}
+class RemoveBookFromCatalogActivity {
++RemoveBookFromCatalogActivity() :
++RemoveBookFromCatalogResponse execute(RemoveBookFromCatalogRequest removeBookFromCatalogRequest) : RemoveBookFromCatalogResponse
+}
+
+class SubmitBookForPublishingActivity {
+-publishingStatusDao : PublishingStatusDao
++SubmitBookForPublishingActivity(PublishingStatusDao publishingStatusDao) :
++SubmitBookForPublishingResponse execute(SubmitBookForPublishingRequest request) : SubmitBookForPublishingResponse
+
+}
+
+'title Clients
+
+class RecommendationsServiceClient {
+-recommendationsService : RecommendationsService
++RecommendationsServiceClient(RecommendationsService service)
++List<BookRecommendation> getBookRecommendations(BookGenre genre) : recommendations
+
+}
+
+'title dao
+
+class CatalogDao {
+-dynamoDbMapper : DynamoDBMapper
++CatalogItemVersion getBookFromCatalog(String bookId) : book
+-CatalogItemVersion getLatestVersionOfBook(String bookId)
+}
+
+class PublishingStatusDao {
+-dynamoDbMapper : DynamoDBMapper
+
+}
+
+'title dynamodb.models
+
+class CatalogItemVersion {
+@DynamoDBHashKey bookId: String
+@DynamoDBRangeKey version : int
+-inactive:boolean
+-title : String
+-author : String
+-text : String
+-genre : BookGenre
+}
+
+class PublishingStatusItem {
+@DynamoDBHashKey publishingRecordId: String
+@DynamoDBRangeKey status : PublishingRecordStatus
+-statusMessage: String
+-bookId : String
+}
+
+'title exceptions
+
+class BookNotFoundException extends RuntimeException {
+-serialVersionUID : long
+}
+
+class PublishingStatusNotFoundException extends RuntimeException {
+-serialVersionUID : long
+}
+CatalogItemVersion *-- CatalogDao
+GetBookActivity *-- CatalogDao
+GetBookActivity *-- RecommendationsServiceClient
+PublishingStatusItem *-- PublishingStatusDao
+SubmitBookForPublishingActivity  *-- PublishingStatusDao
+
+CatalogDao *-- BookNotFoundException
+
+
+
+
+@enduml
