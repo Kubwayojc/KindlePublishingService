@@ -39,6 +39,8 @@ public class CatalogDao {
             throw new BookNotFoundException(String.format("No book found for id: %s", bookId));
         }
 
+
+
         return book;
     }
 
@@ -57,5 +59,17 @@ public class CatalogDao {
             return null;
         }
         return results.get(0);
+    }
+
+    public CatalogItemVersion removeBookFromCatalog(String bookId) {
+
+        CatalogItemVersion book = getBookFromCatalog(bookId);
+
+        book.setInactive(true);
+
+        dynamoDbMapper.save(book);
+
+        return book;
+
     }
 }

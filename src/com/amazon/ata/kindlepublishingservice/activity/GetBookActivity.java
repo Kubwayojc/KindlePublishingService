@@ -2,6 +2,7 @@ package com.amazon.ata.kindlepublishingservice.activity;
 
 import com.amazon.ata.kindlepublishingservice.clients.RecommendationsServiceClient;
 import com.amazon.ata.kindlepublishingservice.converters.CatalogItemConverter;
+import com.amazon.ata.kindlepublishingservice.exceptions.BookNotFoundException;
 import com.amazon.ata.recommendationsservice.types.BookGenre;
 import com.amazon.ata.kindlepublishingservice.models.requests.GetBookRequest;
 import com.amazon.ata.kindlepublishingservice.models.response.GetBookResponse;
@@ -14,6 +15,8 @@ import com.amazonaws.services.lambda.runtime.RequestHandler;
 
 import java.util.List;
 import javax.inject.Inject;
+
+import static org.checkerframework.checker.nullness.Opt.orElseThrow;
 
 /**
  * Implementation of the GetBookActivity for the ATACurriculumKindlePublishingService's
@@ -32,6 +35,7 @@ public class GetBookActivity {
      * @param catalogDao CatalogDao to access the Catalog table.
      * @param recommendationServiceClient Returns recommendations based on genre.
      */
+
     @Inject
     public GetBookActivity(CatalogDao catalogDao, RecommendationsServiceClient recommendationServiceClient) {
         this.catalogDao = catalogDao;
@@ -53,5 +57,12 @@ public class GetBookActivity {
             .withBook(CatalogItemConverter.toBook(catalogItem))
             .withRecommendations(RecommendationsCoralConverter.toCoral(recommendations))
             .build();
+
+
+
     }
+
+
+
+
 }
