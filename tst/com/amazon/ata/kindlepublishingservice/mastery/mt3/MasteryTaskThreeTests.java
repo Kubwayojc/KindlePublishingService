@@ -36,6 +36,8 @@ public class MasteryTaskThreeTests extends IntegrationTestBase {
         savePublishingStatuses();
     }
 
+    //here is question
+
     @Test
     public void getPublishingStatus_singleStatus_returnsSingleRecord() {
         // GIVEN
