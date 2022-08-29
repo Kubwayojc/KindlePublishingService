@@ -28,7 +28,6 @@ public class GetPublishingStatusActivity {
                 .withPublishingStatusHistory(PublishingStatusItemConverter.testPublishingStatusRecord(publishingStatusItemList))
                 .build();
 
-
     }
 
 

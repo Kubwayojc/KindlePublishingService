@@ -1,7 +1,9 @@
 package com.amazon.ata.kindlepublishingservice.dao;
 
 import com.amazon.ata.kindlepublishingservice.dynamodb.models.CatalogItemVersion;
+import com.amazon.ata.kindlepublishingservice.enums.PublishingRecordStatus;
 import com.amazon.ata.kindlepublishingservice.exceptions.BookNotFoundException;
+import com.amazon.ata.kindlepublishingservice.models.PublishingStatus;
 import com.amazon.ata.kindlepublishingservice.publishing.KindleFormattedBook;
 import com.amazon.ata.kindlepublishingservice.utils.KindlePublishingUtils;
 
@@ -43,7 +45,8 @@ public class CatalogDao {
     }
 
     // Returns null if no version exists for the provided bookId
-    private CatalogItemVersion getLatestVersionOfBook(String bookId) {
+
+    public CatalogItemVersion getLatestVersionOfBook(String bookId) {
         CatalogItemVersion book = new CatalogItemVersion();
         book.setBookId(bookId);
 
@@ -71,12 +74,58 @@ public class CatalogDao {
 
     }
 
-    public void validateBookExists(String bookId) {
+    public CatalogItemVersion validateBookExists(String bookId) {
         CatalogItemVersion catalogItemVersion = getLatestVersionOfBook(bookId);
 
         if(catalogItemVersion == null){
             throw new BookNotFoundException(String.format("No book found for id: %s", bookId));
         }
 
+        return catalogItemVersion;
+
     }
+
+    public void addOrUpdateBook(CatalogItemVersion book) {
+
+        dynamoDbMapper.save(book);
+
+    }
+
+
+    public CatalogItemVersion createOrUpdateBook(KindleFormattedBook book){
+
+
+
+        String bookId_New = book.getBookId();
+
+        CatalogItemVersion new_book = new CatalogItemVersion();
+
+        new_book.setInactive(false);
+        new_book.setAuthor(book.getAuthor());
+        new_book.setGenre(book.getGenre());
+        new_book.setText(book.getText());
+        new_book.setTitle(book.getTitle());
+
+        if(bookId_New ==  null) {
+
+            new_book.setVersion(1);
+            new_book.setBookId(KindlePublishingUtils.generateBookId());
+            addOrUpdateBook(new_book);
+
+        } else {
+
+            CatalogItemVersion existing_Book = validateBookExists(bookId_New);
+
+            new_book.setBookId(bookId_New);
+            new_book.setVersion(existing_Book.getVersion() + 1);
+
+            removeBookFromCatalog(existing_Book.getBookId());
+
+            addOrUpdateBook(new_book);
+        }
+
+        return new_book;
+    }
+
+
 }
